@@ -3,7 +3,7 @@ using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshPro _scoreText;
+    [SerializeField] private TextMeshProUGUI _scoreText;
 
     public static ScoreManager Instance;
     private int _score;
