@@ -10,8 +10,6 @@ public class CameraFollow : MonoBehaviour
     private float _horizontalRotation;
     private float _verticalRotation;
 
-    private Vector3 _position;
-
     private void LateUpdate()
     {
         CalculateValue();
