@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78b3bd2ffa7ca7849a7f47f2d93cb11b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Collectible
+  _collectibleEffectPrefab: {fileID: 5823918253246894543, guid: 3e5f95d9268919441bc530ef335974f4, type: 3}
   _valuePoint: 1
 --- !u!114 &2892415427573932987
 MonoBehaviour:
