@@ -7,7 +7,7 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float rotationSpeed = 3f;     // чувствительность мыши
     [SerializeField] private float rotationSmooth = 0.1f;  // сглаживание поворота Pivot
 
-    private Vector3 velocity = Vector3.zero; // для SmoothDamp позиции
+    private Vector3 velocity = Vector3.zero;
     private float yaw = 0f;
     private float pitch = 20f;
 
@@ -15,7 +15,7 @@ public class CameraFollow : MonoBehaviour
     {
         if (target == null) return;
 
-        // --- Считаем вращение мышью ---
+        // --- Вращение Pivot мышью ---
         yaw += Input.GetAxis("Mouse X") * rotationSpeed;
         pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
         pitch = Mathf.Clamp(pitch, 5f, 80f);
@@ -24,7 +24,7 @@ public class CameraFollow : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(pitch, yaw, 0f);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmooth);
 
-        // --- Плавное движение Pivot за игроком ---
+        // --- Плавное движение Pivot за кубом ---
         Vector3 desiredPosition = target.position;
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, followSmooth);
     }

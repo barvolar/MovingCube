@@ -1,85 +1,51 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerPhysicsController : MonoBehaviour
+public class PlayerSmoothMovement : MonoBehaviour
 {
-    [SerializeField] private float _speed;
-    [SerializeField] private float _jumpForce;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float rotationSmooth = 0.15f; // сглаживание поворота
+    [SerializeField] private Camera mainCamera;
 
-    private Camera _camera;
-    private Rigidbody _rigidBody;
-    private float _horizontal;
-    private float _vertical;
-    private Vector3 _directionMove;
-    private bool _isGrounded;
+    private Rigidbody rb;
+    private Vector3 moveDirection = Vector3.zero;
 
     private void Awake()
     {
-        if (_camera == null)
-            _camera = Camera.main;
-
-        if (_rigidBody == null)
-            _rigidBody = GetComponent<Rigidbody>();
-    }
-
-    private void Update()
-    {
-        CalculateValue();
-        Jump();
+        rb = GetComponent<Rigidbody>();
+        if (mainCamera == null) mainCamera = Camera.main;
     }
 
     private void FixedUpdate()
     {
-        Locomotion();
+        MovePlayer();
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void MovePlayer()
     {
-        if (collision.contacts[0].normal == Vector3.up)
+        // Получаем ввод (WASD)
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        Vector3 inputDir = new Vector3(h, 0, v).normalized;
+
+        if (inputDir.magnitude >= 0.1f)
         {
-            _isGrounded = true;
+            // Направление относительно камеры
+            Vector3 camForward = mainCamera.transform.forward;
+            camForward.y = 0;
+            Vector3 camRight = mainCamera.transform.right;
+            camRight.y = 0;
+
+            moveDirection = (inputDir.x * camRight + inputDir.z * camForward).normalized;
+
+            // Плавное движение
+            Vector3 targetPos = rb.position + moveDirection * speed * Time.fixedDeltaTime;
+            rb.MovePosition(Vector3.Lerp(rb.position, targetPos, 0.5f));
+
+            // Плавный поворот
+            Quaternion targetRot = Quaternion.LookRotation(moveDirection);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, rotationSmooth));
         }
     }
-
-    private void CalculateValue()
-    {
-        _horizontal = Input.GetAxis("Horizontal");
-        _vertical = Input.GetAxis("Vertical");
-        _directionMove = new Vector3(_horizontal, 0, _vertical).normalized;
-    }
-
-    private void Locomotion()
-    {
-        Vector3 cameraForvard = _camera.transform.forward;
-        cameraForvard.y = 0;
-        cameraForvard.Normalize();
-
-        Vector3 cameraRight = _camera.transform.right;
-        cameraRight.y = 0;
-        cameraRight.Normalize();
-
-        Vector3 direction = cameraForvard * _vertical + cameraRight * _horizontal;
-
-        if (direction.magnitude > 0.1f)
-        {
-            direction.Normalize();
-
-            _rigidBody.MovePosition(_rigidBody.position + direction * _speed * Time.fixedDeltaTime);
-            
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            _rigidBody.MoveRotation(Quaternion.Slerp(_rigidBody.rotation, targetRotation, 0.2f));
-        }
-    }
-
-    private void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
-        {
-            _rigidBody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
-            _isGrounded = false;
-        }
-    }
-
-
 }
