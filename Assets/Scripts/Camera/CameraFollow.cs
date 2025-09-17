@@ -1,34 +1,32 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] private Transform _target;
-    [SerializeField] private Vector3 _offsed;
-    [SerializeField] private float _smoothSpeed = 0.125f;
-    [SerializeField] private float _mouseSensetivity = 3f;
+    [SerializeField] private Transform target;         // Игрок
+    [SerializeField] private Vector3 offset = new Vector3(0, 5, -7);
+    [SerializeField] private float followSpeed = 5f;   // Плавность движения
+    [SerializeField] private float rotationSpeed = 3f; // Чувствительность мыши
 
-    private float _horizontalRotation;
-    private float _verticalRotation;
+    private float yaw = 0f;   // Горизонтальное вращение
+    private float pitch = 20f; // Вертикальное вращение
 
     private void LateUpdate()
     {
-        CalculateValue();
-        Rotation();
-    }
+        if (target == null) return;
 
-    private void CalculateValue()
-    {
-        Vector3 _targetPosition = _target.position + Quaternion.Euler(_verticalRotation, _horizontalRotation, 0) * _offsed;
-        Vector3 smoothPosition = Vector3.Lerp(transform.position, _targetPosition, _smoothSpeed * Time.deltaTime);
+        // --- Вращение мышью ---
+        yaw += Input.GetAxis("Mouse X") * rotationSpeed;
+        pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
+        pitch = Mathf.Clamp(pitch, 5f, 80f);
 
-        transform.position = smoothPosition;
-        transform.LookAt(_target.position + Vector3.up * 1.5f);
-    }
+        // --- Позиция камеры ---
+        Vector3 desiredPosition = target.position + Quaternion.Euler(pitch, yaw, 0) * offset;
 
-    private void Rotation()
-    {
-        _horizontalRotation += Input.GetAxis("Mouse X") * _mouseSensetivity;
-        _verticalRotation -= Input.GetAxis("Mouse Y") * _mouseSensetivity;
-        _verticalRotation = Mathf.Clamp(_verticalRotation, 5, 80);
+        // Если игрок двигается через Rigidbody → используем Time.fixedDeltaTime для синхронизации
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.fixedDeltaTime);
+
+        // --- Камера смотрит на игрока с небольшим смещением по Y ---
+        Vector3 lookTarget = target.position + Vector3.up * 1.5f;
+        transform.LookAt(lookTarget);
     }
 }
