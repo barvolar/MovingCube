@@ -2,13 +2,13 @@
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] private Transform target;         // Игрок
-    [SerializeField] private Vector3 offset = new Vector3(0, 5, -7);
-    [SerializeField] private float followSpeed = 5f;   // Плавность движения
+    [SerializeField] private Transform target;        // Игрок
+    [SerializeField] private float followSpeed = 5f;  // Плавность движения Pivot
     [SerializeField] private float rotationSpeed = 3f; // Чувствительность мыши
+    [SerializeField] private float rotationSmooth = 0.1f; // сглаживание вращения
 
-    private float yaw = 0f;   // Горизонтальное вращение
-    private float pitch = 20f; // Вертикальное вращение
+    private float yaw = 0f;
+    private float pitch = 20f;
 
     private void LateUpdate()
     {
@@ -19,14 +19,12 @@ public class CameraFollow : MonoBehaviour
         pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
         pitch = Mathf.Clamp(pitch, 5f, 80f);
 
-        // --- Позиция камеры ---
-        Vector3 desiredPosition = target.position + Quaternion.Euler(pitch, yaw, 0) * offset;
+        // --- Плавное движение Pivot к игроку ---
+        Vector3 desiredPosition = target.position;
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
 
-        // Если игрок двигается через Rigidbody → используем Time.fixedDeltaTime для синхронизации
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.fixedDeltaTime);
-
-        // --- Камера смотрит на игрока с небольшим смещением по Y ---
-        Vector3 lookTarget = target.position + Vector3.up * 1.5f;
-        transform.LookAt(lookTarget);
+        // --- Плавный поворот Pivot ---
+        Quaternion targetRotation = Quaternion.Euler(pitch, yaw, 0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmooth);
     }
 }
