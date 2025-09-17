@@ -9,8 +9,8 @@ public class PlayerPhysicsController : MonoBehaviour
 
     private Camera _camera;
     private Rigidbody _rigidBody;
-    private float _xMove;
-    private float _zMove;
+    private float _horizontal;
+    private float _vertical;
     private Vector3 _directionMove;
     private bool _isGrounded;
 
@@ -44,29 +44,32 @@ public class PlayerPhysicsController : MonoBehaviour
 
     private void CalculateValue()
     {
-        _xMove = Input.GetAxis("Horizontal");
-        _zMove = Input.GetAxis("Vertical");
-        _directionMove = new Vector3(_xMove, 0, _zMove).normalized;
+        _horizontal = Input.GetAxis("Horizontal");
+        _vertical = Input.GetAxis("Vertical");
+        _directionMove = new Vector3(_horizontal, 0, _vertical).normalized;
     }
 
     private void Locomotion()
     {
-        Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-        if (!groundPlane.Raycast(ray, out float enter)) return;
+        Vector3 cameraForvard = _camera.transform.forward;
+        cameraForvard.y = 0;
+        cameraForvard.Normalize();
 
-        Vector3 mousePosition = ray.GetPoint(enter);
-        Vector3 direction = mousePosition - transform.position;
-        direction.y = 0;
+        Vector3 cameraRight = _camera.transform.right;
+        cameraRight.y = 0;
+        cameraRight.Normalize();
 
-        if (direction.magnitude > 0)
+        Vector3 direction = cameraForvard * _vertical + cameraRight * _horizontal;
+
+        if (direction.magnitude > 0.1f)
         {
-            Vector3 moveDirection = direction.normalized;
-            _rigidBody.MovePosition(_rigidBody.position + moveDirection * _speed * Time.fixedDeltaTime);
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            direction.Normalize();
+
+            _rigidBody.MovePosition(_rigidBody.position + direction * _speed * Time.fixedDeltaTime);
+            
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
             _rigidBody.MoveRotation(Quaternion.Slerp(_rigidBody.rotation, targetRotation, 0.2f));
         }
-      
     }
 
     private void Jump()
