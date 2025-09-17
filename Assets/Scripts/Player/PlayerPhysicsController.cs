@@ -1,14 +1,12 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerSmoothMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
-    [SerializeField] private float rotationSmooth = 0.15f; // сглаживание поворота
     [SerializeField] private Camera mainCamera;
 
     private Rigidbody rb;
-    private Vector3 moveDirection = Vector3.zero;
 
     private void Awake()
     {
@@ -18,12 +16,11 @@ public class PlayerSmoothMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        Move();
     }
 
-    private void MovePlayer()
+    private void Move()
     {
-        // Получаем ввод (WASD)
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
@@ -37,15 +34,10 @@ public class PlayerSmoothMovement : MonoBehaviour
             Vector3 camRight = mainCamera.transform.right;
             camRight.y = 0;
 
-            moveDirection = (inputDir.x * camRight + inputDir.z * camForward).normalized;
+            Vector3 moveDir = (inputDir.x * camRight + inputDir.z * camForward).normalized;
 
-            // Плавное движение
-            Vector3 targetPos = rb.position + moveDirection * speed * Time.fixedDeltaTime;
+            Vector3 targetPos = rb.position + moveDir * speed * Time.fixedDeltaTime;
             rb.MovePosition(Vector3.Lerp(rb.position, targetPos, 0.5f));
-
-            // Плавный поворот
-            Quaternion targetRot = Quaternion.LookRotation(moveDirection);
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, rotationSmooth));
         }
     }
 }
