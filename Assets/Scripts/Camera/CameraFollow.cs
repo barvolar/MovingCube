@@ -19,10 +19,10 @@ public class CameraFollow : MonoBehaviour
     private void CalculateValue()
     {
         Vector3 _targetPosition = _target.position + Quaternion.Euler(_verticalRotation, _horizontalRotation, 0) * _offsed;
-        Vector3 smoothPosition = Vector3.Lerp(transform.position, _targetPosition, _smoothSpeed);
+        Vector3 smoothPosition = Vector3.Lerp(transform.position, _targetPosition, _smoothSpeed * Time.deltaTime);
 
         transform.position = smoothPosition;
-        transform.LookAt(_target);
+        transform.LookAt(_target.position + Vector3.up * 1.5f);
     }
 
     private void Rotation()
