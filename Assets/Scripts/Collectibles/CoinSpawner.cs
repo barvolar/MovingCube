@@ -5,7 +5,7 @@ public class CoinSpawner : MonoBehaviour
     [SerializeField] private Collectible _coinPrefab;
     [SerializeField] private float _spawnSpeed;
     [SerializeField] private Vector3 _spawnMaximumPosition;
-    [SerializeField] private Vector3 _spawnMinumimPosition;
+    [SerializeField] private Vector3 _spawnMinimumPosition;
 
     private float _timeSpawn;
     private Vector3 _spawnPosition;
@@ -27,9 +27,9 @@ public class CoinSpawner : MonoBehaviour
     private Vector3 CalculateSpawnPosition()
     {
         _spawnPosition = new Vector3
-          ( Random.Range(_spawnMinumimPosition.x, _spawnMaximumPosition.x),
-            Random.Range(_spawnMinumimPosition.y, _spawnMaximumPosition.y),
-            Random.Range(_spawnMaximumPosition.z, _spawnMaximumPosition.z));
+          ( Random.Range(_spawnMinimumPosition.x, _spawnMaximumPosition.x),
+            Random.Range(_spawnMinimumPosition.y, _spawnMaximumPosition.y),
+            Random.Range(_spawnMinimumPosition.z, _spawnMaximumPosition.z));
 
         return _spawnPosition;
     }
