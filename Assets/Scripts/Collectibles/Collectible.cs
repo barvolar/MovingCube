@@ -7,6 +7,7 @@ public class Collectible : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.tag);
         if (other.CompareTag("Player"))
         {
             if (_collectibleEffectPrefab != null)
