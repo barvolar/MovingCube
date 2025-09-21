@@ -33,4 +33,5 @@ public class CoinSpawner : MonoBehaviour
 
         return _spawnPosition;
     }
+
 }
